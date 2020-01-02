@@ -77,11 +77,20 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class BetSlip extends StatefulWidget with PreferredSizeWidget {
+class BetSlip extends StatefulWidget with PreferredHeightWidget {
+  _BetSlipState state;
+
   @override
   _BetSlipState createState() => _BetSlipState();
 
-  Size get preferredSize => Size(0, 600);
+  Size preferredSize(BuildContext context) {
+//    _BetSlipState state = context.findAncestorStateOfType<State<BetSlip>>();
+    var preferredSize = state?.preferredSize;
+    if (preferredSize != null) {
+      return Size(0, 48 + 56 + preferredSize.height);
+    }
+    return preferredSize;
+  }
 }
 
 class _BetSlipState extends State<BetSlip> with SingleTickerProviderStateMixin {
@@ -95,7 +104,14 @@ class _BetSlipState extends State<BetSlip> with SingleTickerProviderStateMixin {
   _BetSlipState();
 
   @override
+  void didUpdateWidget(BetSlip oldWidget) {
+    widget.state = this;
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
+    widget.state = this;
     controller = TabController(length: 3, vsync: this);
     super.initState();
   }
@@ -162,7 +178,11 @@ class _MyTabView extends StatelessWidget with PreferredSizeWidget {
 
   @override
   Size get preferredSize {
-    RenderBox box = _contentKey1.currentContext.findRenderObject();
-    return box?.size ?? Size(0, preferredHeight);
+    RenderBox box1 = _contentKey1.currentContext?.findRenderObject();
+    RenderBox box2 = _contentKey2.currentContext?.findRenderObject();
+    if (box1 != null && box2 != null) {
+      return Size(0, box1.size.height + box2.size.height);
+    }
+    return null;
   }
 }

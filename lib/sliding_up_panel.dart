@@ -9,3 +9,4 @@ Licensing: More information can be found here: https://github.com/akshathjain/sl
 library sliding_up_panel;
 
 export 'src/panel.dart';
+export 'src/preferred_height.dart';

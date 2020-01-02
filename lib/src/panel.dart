@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 
+import '../sliding_up_panel.dart';
+
 enum SlideDirection {
   UP,
   DOWN,
@@ -16,7 +18,7 @@ class SlidingUpPanel extends StatefulWidget {
   /// then top portion of this Widget will be displayed;
   /// otherwise, [collapsed] will be displayed overtop
   /// of this Widget.
-  final PreferredSizeWidget panel;
+  final PreferredHeightWidget panel;
 
   /// The Widget displayed overtop the [panel] when collapsed.
   /// This fades out as the panel is opened.
@@ -208,7 +210,7 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
 
   @override
   void afterFirstLayout(BuildContext context) {
-    double height = _determineContentHeight();
+    double height = _determineContentHeight(context);
     print('AFTER LAYOUT ${height}');
     if (_maxHeight != height) {
       setState(() {
@@ -217,8 +219,8 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
     }
   }
 
-  double _determineContentHeight() {
-    var preferedHeight = widget.panel.preferredSize?.height;
+  double _determineContentHeight(BuildContext context) {
+    var preferedHeight = widget.panel.preferredSize(context)?.height;
     if (preferedHeight == null) {
       return _maxHeight;
     }
@@ -291,7 +293,7 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                           child: NotificationListener<LayoutChangedNotification>(
                             onNotification: (not) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
-                                var height = _determineContentHeight();
+                                var height = _determineContentHeight(context);
                                 print("NEWS SIZE ${height}");
                                 if (height != _maxHeight) {
                                   _maxHeight = height;
