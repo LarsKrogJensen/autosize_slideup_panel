@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -96,9 +97,9 @@ class BetSlip extends StatefulWidget with PreferredHeightWidget {
 class _BetSlipState extends State<BetSlip> with SingleTickerProviderStateMixin {
   TabController controller;
   List<_MyTabView> views = [
-    _MyTabView(preferredHeight: 100, color: Colors.blue),
-    _MyTabView(preferredHeight: 200, color: Colors.green),
-    _MyTabView(preferredHeight: 300, color: Colors.red),
+    _MyTabView(preferredHeight: 200, color: Colors.blue),
+    _MyTabView(preferredHeight: 300, color: Colors.green),
+    _MyTabView(preferredHeight: 400, color: Colors.red),
   ];
 
   _BetSlipState();
@@ -116,7 +117,11 @@ class _BetSlipState extends State<BetSlip> with SingleTickerProviderStateMixin {
     super.initState();
   }
 
-  Size get preferredSize => views[controller.index].preferredSize;
+  Size get preferredSize {
+//    controller.indexIsChanging
+//    print('Is Index changing ${controller.indexIsChanging}');
+    return views[controller.index].preferredSize;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,9 +185,47 @@ class _MyTabView extends StatelessWidget with PreferredSizeWidget {
   Size get preferredSize {
     RenderBox box1 = _contentKey1.currentContext?.findRenderObject();
     RenderBox box2 = _contentKey2.currentContext?.findRenderObject();
-    if (box1 != null && box2 != null) {
+    if (box1 != null && box2 != null && box1.hasSize && box2.hasSize) {
       return Size(0, box1.size.height + box2.size.height);
     }
     return null;
+  }
+}
+
+class DemoContainer extends StatefulWidget {
+  final double preferredHeight;
+  final Color color;
+
+  const DemoContainer({Key key, this.preferredHeight, this.color}) : super(key: key);
+
+  @override
+  _DemoContainerState createState() => _DemoContainerState();
+}
+
+class _DemoContainerState extends State<DemoContainer> {
+  double _height;
+  bool _expanded = false;
+
+  @override
+  void initState() {
+    _height = widget.preferredHeight;
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: _expanded ? _height : _height * 1.5,
+      color: widget.color,
+      child: Center(
+        child: RaisedButton(
+          onPressed: () {
+            setState(() => _expanded = !_expanded);
+            LayoutChangedNotification().dispatch(context);
+          },
+          child: Text("Expand/collapse"),
+        ),
+      ),
+    );
   }
 }

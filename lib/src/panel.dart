@@ -212,10 +212,16 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
   void afterFirstLayout(BuildContext context) {
     double height = _determineContentHeight(context);
     print('AFTER LAYOUT ${height}');
-    if (_maxHeight != height) {
-      setState(() {
-        _maxHeight = min(height, widget.maxHeight);
+    if (height == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        afterFirstLayout(context);
       });
+    } else {
+      if (_maxHeight != height) {
+        setState(() {
+          _maxHeight = min(height, widget.maxHeight);
+        });
+      }
     }
   }
 
@@ -294,7 +300,7 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
                             onNotification: (not) {
                               WidgetsBinding.instance.addPostFrameCallback((_) {
                                 var height = _determineContentHeight(context);
-                                print("NEWS SIZE ${height}");
+                                print("NEWS SIZE $height");
                                 if (height != _maxHeight) {
                                   _maxHeight = height;
                                   _anmiateSizeChange = true;
