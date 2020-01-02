@@ -1,29 +1,13 @@
-/*
-Name: Akshath Jain
-Date: 3/18/19
-Purpose: Example app that implements the package: sliding_up_panel
-Copyright: © 2019, Akshath Jain. All rights reserved.
-Licensing: More information can be found here: https://github.com/akshathjain/sliding_up_panel/blob/master/LICENSE
-*/
-
 import 'package:flutter/material.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/services.dart';
-
-// uncomment the following lines before running; there's an ongoing issue with
-// pub that causes warnings to be thrown when analyzing nested flutter
-// packages - issue #17168, https://github.com/flutter/flutter/issues/17168
-
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/widgets.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 void main() => runApp(SlidingUpPanelExample());
 
 class SlidingUpPanelExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.grey[200],
       systemNavigationBarIconBrightness: Brightness.dark,
@@ -33,9 +17,7 @@ class SlidingUpPanelExample extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'SlidingUpPanel Example',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: HomePage(),
     );
   }
@@ -47,257 +29,140 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  final double _initFabHeight = 120.0;
-  double _fabHeight;
   double _panelHeightOpen = 575.0;
-  double _panelHeightClosed = 95.0;
+  double _panelHeightClosed = 48.0;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-
-    _fabHeight = _initFabHeight;
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Material(
       child: Stack(
         alignment: Alignment.topCenter,
         children: <Widget>[
-
           SlidingUpPanel(
             maxHeight: _panelHeightOpen,
             minHeight: _panelHeightClosed,
-            parallaxEnabled: true,
+            backdropEnabled: true,
             parallaxOffset: .5,
             body: _body(),
-            panel: _panel(),
+            panel: BetSlip(),
             borderRadius: BorderRadius.only(topLeft: Radius.circular(18.0), topRight: Radius.circular(18.0)),
-            onPanelSlide: (double pos) => setState((){
-              _fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) + _initFabHeight;
-            }),
           ),
-
-          // the fab
-          Positioned(
-            right: 20.0,
-            bottom: _fabHeight,
-            child: FloatingActionButton(
-              child: Icon(
-                Icons.gps_fixed,
-                color: Theme.of(context).primaryColor,
-              ),
-              onPressed: (){},
-              backgroundColor: Colors.white,
-            ),
-          ),
-
-          //the SlidingUpPanel Titel
           Positioned(
             top: 42.0,
             child: Container(
               padding: const EdgeInsets.fromLTRB(24.0, 18.0, 24.0, 18.0),
               child: Text(
                 "SlidingUpPanel Example",
-                style: TextStyle(
-                  fontWeight: FontWeight.w500
-                ),
+                style: TextStyle(fontWeight: FontWeight.w500),
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24.0),
-                boxShadow: [BoxShadow(
-                  color: Color.fromRGBO(0, 0, 0, .25),
-                  blurRadius: 16.0
-                )],
+                boxShadow: [BoxShadow(color: Color.fromRGBO(0, 0, 0, .25), blurRadius: 16.0)],
               ),
             ),
           ),
-
-
         ],
       ),
     );
   }
 
-  Widget _panel(){
+  Widget _body() {
+    return Container(color: Colors.yellow);
+  }
+}
+
+class BetSlip extends StatefulWidget with PreferredSizeWidget {
+  @override
+  _BetSlipState createState() => _BetSlipState();
+
+  Size get preferredSize => Size(0, 600);
+}
+
+class _BetSlipState extends State<BetSlip> with SingleTickerProviderStateMixin {
+  TabController controller;
+  List<_MyTabView> views = [
+    _MyTabView(preferredHeight: 100, color: Colors.blue),
+    _MyTabView(preferredHeight: 200, color: Colors.green),
+    _MyTabView(preferredHeight: 300, color: Colors.red),
+  ];
+
+  _BetSlipState();
+
+  @override
+  void initState() {
+    controller = TabController(length: 3, vsync: this);
+    super.initState();
+  }
+
+  Size get preferredSize => views[controller.index].preferredSize;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        SizedBox(height: 12.0,),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: 30,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.all(Radius.circular(12.0))
-              ),
-            ),
-          ],
-        ),
-
-        SizedBox(height: 18.0,),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Explore Pittsburgh",
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 24.0,
-              ),
-            ),
-          ],
-        ),
-
-        SizedBox(height: 36.0,),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            _button("Popular", Icons.favorite, Colors.blue),
-            _button("Food", Icons.restaurant, Colors.red),
-            _button("Events", Icons.event, Colors.amber),
-            _button("More", Icons.more_horiz, Colors.green),
-          ],
-        ),
-
-        SizedBox(height: 36.0,),
-
         Container(
-          padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-
-              Text("Images", style: TextStyle(fontWeight: FontWeight.w600,)),
-
-              SizedBox(height: 12.0,),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-
-                    CachedNetworkImage(
-                      imageUrl: "https://images.fineartamerica.com/images-medium-large-5/new-pittsburgh-emmanuel-panagiotakis.jpg",
-                      height: 120.0,
-                      width: (MediaQuery.of(context).size.width - 48) / 2 - 2,
-                      fit: BoxFit.cover,
-                    ),
-
-                    CachedNetworkImage(
-                      imageUrl: "https://cdn.pixabay.com/photo/2016/08/11/23/48/pnc-park-1587285_1280.jpg",
-                      width: (MediaQuery.of(context).size.width - 48) / 2 - 2,
-                      height: 120.0,
-                      fit: BoxFit.cover,
-                    ),
-
-                ],
-              ),
-            ],
+          height: 48,
+          alignment: Alignment.center,
+          child: Text(
+            "BetSlip",
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 24.0,
+            ),
           ),
         ),
-
-        SizedBox(height: 36.0,),
-
-         Container(
-          padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text("About", style: TextStyle(fontWeight: FontWeight.w600,)),
-
-              SizedBox(height: 12.0,),
-
-              Text(
-                "Pittsburgh is a city in the Commonwealth of Pennsylvania "
-                "in the United States, and is the county seat of Allegheny County. "
-                "As of 2017, a population of 305,704 lives within the city limits, "
-                "making it the 63rd-largest city in the U.S. The metropolitan population "
-                "of 2,353,045 is the largest in both the Ohio Valley and Appalachia, "
-                "the second-largest in Pennsylvania (behind Philadelphia), "
-                "and the 26th-largest in the U.S.  Pittsburgh is located in the "
-                "south west of the state, at the confluence of the Allegheny, "
-                "Monongahela, and Ohio rivers, Pittsburgh is known both as 'the Steel City' "
-                "for its more than 300 steel-related businesses and as the 'City of Bridges' "
-                "for its 446 bridges. The city features 30 skyscrapers, two inclined railways, "
-                "a pre-revolutionary fortification and the Point State Park at the "
-                "confluence of the rivers. The city developed as a vital link of "
-                "the Atlantic coast and Midwest, as the mineral-rich Allegheny "
-                "Mountains made the area coveted by the French and British "
-                "empires, Virginians, Whiskey Rebels, and Civil War raiders. ",
-                maxLines: 7,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+        TabBar(
+          labelColor: Colors.blue,
+          controller: controller,
+          tabs: <Widget>[
+            Tab(text: "Blue"),
+            Tab(text: "Green"),
+            Tab(text: "Ref"),
+          ],
         ),
-
-
+        Flexible(
+          child: TabBarView(controller: controller, children: views),
+        )
       ],
     );
   }
+}
 
-  Widget _button(String label, IconData icon, Color color){
+class _MyTabView extends StatelessWidget with PreferredSizeWidget {
+  final double preferredHeight;
+  final Color color;
+  final GlobalKey _contentKey1 = GlobalKey();
+  final GlobalKey _contentKey2 = GlobalKey();
+
+  _MyTabView({Key key, this.preferredHeight, this.color}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
+        Container(key: _contentKey1, height: preferredHeight - 70, color: color),
+        Spacer(),
         Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Icon(
-            icon,
-            color: Colors.white,
-          ),
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(
-              color: Color.fromRGBO(0, 0, 0, 0.15),
-              blurRadius: 8.0,
-            )]
-          ),
+          key: _contentKey2,
+          height: 70,
+          decoration: BoxDecoration(color: color, border: Border.all(color: Colors.yellow, width: 3)),
         ),
-
-        SizedBox(height: 12.0,),
-
-        Text(label),
       ],
-
     );
   }
 
-  Widget _body(){
-    return FlutterMap(
-      options: MapOptions(
-        center: LatLng(40.441589, -80.010948),
-        zoom: 13,
-        maxZoom: 15,
-      ),
-      layers: [
-        TileLayerOptions(
-          urlTemplate: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png"
-        ),
-
-        MarkerLayerOptions(
-          markers: [
-            Marker(
-              point: LatLng(40.441753, -80.011476),
-              builder: (ctx) => Icon(
-                Icons.location_on,
-                color: Colors.blue,
-                size: 48.0,
-              ),
-              height: 60
-            ),
-          ]
-        ),
-      ],
-    );
+  @override
+  Size get preferredSize {
+    RenderBox box = _contentKey1.currentContext.findRenderObject();
+    return box?.size ?? Size(0, preferredHeight);
   }
 }

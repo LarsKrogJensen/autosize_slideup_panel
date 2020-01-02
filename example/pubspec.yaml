@@ -4,7 +4,7 @@ description: A simple example app for the sliding_up_panel package.
 version: 1.0.0
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
 
 dependencies:
   flutter:
@@ -12,10 +12,6 @@ dependencies:
 
   sliding_up_panel:
     path: ../
-
-  flutter_map: ^0.5.0
-  latlong: ^0.6.1
-  cached_network_image: any
 
   cupertino_icons: ^0.1.2
 
@@ -25,5 +21,7 @@ dev_dependencies:
 
 
 flutter:
-
   uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/images/
